@@ -211,14 +211,13 @@ export default function DrawEvent() {
     const handleJoinClick = () => {
         if (!rewardDetail) return;
         const availableLinks = getVerificationLinks();
-
-        // If there are available verification links, open the current one and show modal.
         if (availableLinks.length > 0) {
             const currentLink = availableLinks[currentVerificationIndex];
-            window.open(currentLink, "_blank");
-            setIsModalOpen(true);
+            if (currentLink) {
+                window.open(currentLink, "_blank");
+                setIsModalOpen(true);
+            }
         } else {
-            // No verification links available; join directly.
             joinUser([]);
         }
     };
@@ -233,9 +232,7 @@ export default function DrawEvent() {
             setErrorMessage(
                 "Verification link does not match. Please try again."
             );
-            setTimeout(() => {
-                setShowErrorModal(false);
-            }, 10000);
+            setTimeout(() => setShowErrorModal(false), 10000);
             return;
         }
 
@@ -243,14 +240,14 @@ export default function DrawEvent() {
         setVerifiedLinks(newVerifiedLinks);
 
         if (currentVerificationIndex < availableLinks.length - 1) {
-            // Move to the next verification link.
             const nextIndex = currentVerificationIndex + 1;
             setCurrentVerificationIndex(nextIndex);
             setVerificationLink("");
             const nextLink = availableLinks[nextIndex];
-            window.open(nextLink, "_blank");
+            if (nextLink) {
+                window.open(nextLink, "_blank");
+            }
         } else {
-            // All verifications complete; join the user.
             joinUser(newVerifiedLinks);
         }
     };
