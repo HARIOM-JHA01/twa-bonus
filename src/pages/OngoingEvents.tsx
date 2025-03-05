@@ -10,23 +10,45 @@ import { Draw } from "../types/type";
 export default function OngoingEvents() {
     const [draws, setDraws] = useState<Draw[]>([]);
     const userContext = useContext(UserContext);
-    const user = userContext?.user || { id: 72 }; // Default user ID
+    const user = userContext?.user;
+    const countryName = user?.country;
 
     useEffect(() => {
-        fetch(
-            `https://bonusforyou.org/api/user/running_draw?user_id=${user.id}`
-        )
-            .then((response) => response.json())
-            .then((data) => setDraws(data.data))
-            .catch((error) => console.error("Error fetching draws:", error));
+        const fetchDraws = async () => {
+            try {
+                const payload = {
+                    user_id: user.id,
+                    contry_id: countryName,
+                };
+                const response = await fetch(
+                    "https://bonusforyou.org/api/user/countrywiserunningdraw",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(payload),
+                    }
+                );
+                if (!response.ok) {
+                    throw new Error(
+                        `Failed to fetch data with status: ${response.status}`
+                    );
+                }
+                const data = await response.json();
+                setDraws(data.data);
+            } catch (error) {
+                console.error("Error fetching draws:", error);
+            }
+        };
+
+        fetchDraws();
 
         WebApp.BackButton.show();
-
-        // Set Back Button click event
         WebApp.BackButton.onClick(() => {
             window.history.back();
         });
-    }, [user.id]);
+    }, [user.id, countryName]);
 
     return (
         <div className="bg-yellow-300">

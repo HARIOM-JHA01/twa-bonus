@@ -11,6 +11,7 @@ export default function AvailableEvents() {
     const [draws, setDraws] = useState<Draw[] | null>(null);
     const userContext = useContext(UserContext);
     const user = userContext?.user;
+    const countryName = user?.country;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -20,8 +21,19 @@ export default function AvailableEvents() {
                     console.error("User ID not available, cannot fetch data");
                     return;
                 }
+                const payload = {
+                    user_id: user.id,
+                    contry_id: countryName,
+                };
                 const response = await fetch(
-                    `https://bonusforyou.org/api/user/drawlist?user_id=${user.id}`
+                    "https://bonusforyou.org/api/user/countrywisedraw",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(payload),
+                    }
                 );
                 if (!response.ok) {
                     throw new Error(
@@ -29,7 +41,12 @@ export default function AvailableEvents() {
                     );
                 }
                 const data = await response.json();
-                setDraws(data.data);
+                console.log("Data fetched:", data);
+                if (data.status === false) {
+                    setDraws([]);
+                } else {
+                    setDraws(data.data);
+                }
             } catch (error) {
                 console.error("Error fetching data:", error);
                 setDraws(null);
@@ -58,7 +75,7 @@ export default function AvailableEvents() {
                     Available Events
                 </div>
                 <section className="mt-4 px-2">
-                    <div className="rounded-md shadow-md">
+                    <div className="p-2 rounded-md text-center shadow-md">
                         {draws?.length === 0 ? (
                             <h2>No Data to Display</h2>
                         ) : (

@@ -12,18 +12,27 @@ const Header = () => {
     const languageImage = "/hnkf.png";
 
     const handleToggleLanguage = () => {
-        const newLanguage = i18n.language === 'en' ? 'zh' : 'en';
+        const newLanguage = i18n.language === "en" ? "zh" : "en";
         i18n.changeLanguage(newLanguage);
     };
 
     return (
-        <header className="flex justify-between items-center pt-3 pl-3 pr-2 bg-[#37474F] pb-3  relative z-50">
-            <img src={logoImage} alt="Bonus For You Logo" onError={(e: any) => { e.target.src = 'fallback-logo.png' }} width={"30px"} height={"30px"} className="flex-shrink-0" />
+        <header className="flex pt-3 pl-3 pr-2 bg-gray-700 pb-3  relative z-50">
+            <img
+                src={logoImage}
+                alt="Bonus For You Logo"
+                onError={(e: any) => {
+                    e.target.src = "fallback-logo.png";
+                }}
+                width={"32px"}
+                height={"30px"}
+                className="flex-shrink-0 mr-14"
+            />
             <h1
                 onClick={() => router("/")}
-                className="text-white font-semibold cursor-pointer text-overflow-ellipsis whitespace-nowrap overflow-hidden"
+                className="text-white text-2xl mr-8 cursor-pointer text-overflow-ellipsis whitespace-nowrap overflow-hidden"
             >
-                {t('common.appName')}
+                {t("common.appName")}
             </h1>
 
             <div className="relative flex gap-2">

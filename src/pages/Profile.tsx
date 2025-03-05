@@ -2,10 +2,9 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useState, useEffect, useContext } from "react";
 import WebApp from "@twa-dev/sdk";
-import { UserContext } from '../context/UserContext.js';
+import { UserContext } from "../context/UserContext.js";
 
 export default function Profile() {
-
     const [error, setError] = useState("");
     const profileImage = "/profile.jpg";
 
@@ -16,7 +15,6 @@ export default function Profile() {
     }
     const { user, isLoggedIn } = userContext;
 
-
     useEffect(() => {
         WebApp.BackButton.show();
         WebApp.BackButton.onClick(() => {
@@ -24,11 +22,9 @@ export default function Profile() {
         });
 
         return () => {
-            WebApp.BackButton.offClick(
-                () => {
-                    window.history.back();
-                },
-            );
+            WebApp.BackButton.offClick(() => {
+                window.history.back();
+            });
         };
     }, []);
 
@@ -40,42 +36,59 @@ export default function Profile() {
                     <h1 className="text-red-600 font-bold">{error}</h1>
                 ) : (
                     <>
-                        {isLoggedIn ?
+                        {isLoggedIn ? (
                             <div className="flex flex-col justify-center gap-4 w-[90%] max-w-md bg-yellow-300  rounded-lg shadow-md">
                                 <div className="flex flex-col">
+                                    <img
+                                        src={profileImage}
+                                        alt="Bonus For You Logo"
+                                        onError={(e: any) => {
+                                            e.target.src = "fallback-logo.png";
+                                        }}
+                                        className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-5"
+                                    />
 
-                                    <img src={profileImage} alt="Bonus For You Logo" onError={(e: any) => { e.target.src = 'fallback-logo.png' }} className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-5" />
-
-                                    <label className="font-semibold text-xl text-black">Name</label>
+                                    <label className="font-semibold text-xl text-black">
+                                        Name
+                                    </label>
                                     <div className="border-black border-2 rounded px-4 py-2 text-black">
-                                        {user.name.split('_')[0] || 'Not provided'}
+                                        {user.name.split("_")[0] ||
+                                            "Not provided"}
                                     </div>
                                 </div>
 
                                 <div className="flex flex-col">
-                                    <label className="font-semibold text-xl text-black">Telegram ID</label>
+                                    <label className="font-semibold text-xl text-black">
+                                        Telegram ID
+                                    </label>
                                     <div className="border-black border-2 rounded px-4 py-2 text-black">
-                                        {WebApp.initDataUnsafe.user?.username || 'Not provided'}
+                                        {WebApp.initDataUnsafe.user?.username ||
+                                            "Not provided"}
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <label className="font-semibold text-xl text-black">Country</label>
+                                    <label className="font-semibold text-xl text-black">
+                                        Country
+                                    </label>
                                     <div className="border-black border-2 rounded px-4 py-2 text-black">
-                                        {user.country || ''}
+                                        {user.country || ""}
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <label className="font-semibold text-xl text-black">Participant Code</label>
+                                    <label className="font-semibold text-xl text-black">
+                                        Participant Code
+                                    </label>
                                     <div className="border-black border-2 rounded px-4 py-2 text-black">
-                                        {user.uniqueId || ''}
+                                        {user.uniqueId || ""}
                                     </div>
                                 </div>
                             </div>
-                            :
-                            <div>Loading
+                        ) : (
+                            <div>
+                                Loading
                                 {WebApp.initDataUnsafe.user?.id}
                             </div>
-                        }
+                        )}
                     </>
                 )}
             </main>

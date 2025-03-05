@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode } from "react";
 
 interface UserData {
     id: number | null;
@@ -12,7 +12,7 @@ interface UserContextType {
     user: UserData;
     setUser: (user: UserData) => void;
     isLoggedIn: boolean;
-    setIsLoggedIn: (isLoggedIn: boolean) => void
+    setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
 
 const defaultUser: UserData = {
@@ -21,14 +21,13 @@ const defaultUser: UserData = {
     telegramId: "",
     country: "",
     uniqueId: "",
-}
+};
 const defaultContext: UserContextType = {
     user: defaultUser,
-    setUser: () => { },
+    setUser: () => {},
     isLoggedIn: false,
-    setIsLoggedIn: () => { }
-}
-
+    setIsLoggedIn: () => {},
+};
 
 export const UserContext = createContext<UserContextType>(defaultContext);
 
@@ -38,10 +37,12 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [user, setUser] = useState<UserData>(defaultUser);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
     return (
-        <UserContext.Provider value={{ user, setUser, isLoggedIn, setIsLoggedIn }}>
+        <UserContext.Provider
+            value={{ user, setUser, isLoggedIn, setIsLoggedIn }}
+        >
             {children}
         </UserContext.Provider>
     );

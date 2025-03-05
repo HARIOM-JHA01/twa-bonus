@@ -13,6 +13,8 @@ export default function DrawEvent() {
     );
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [verificationLink, setVerificationLink] = useState("");
+    // New state to accumulate verified links
+    const [verifiedLinks, setVerifiedLinks] = useState<string[]>([]);
     // current verification step index
     const [currentVerificationIndex, setCurrentVerificationIndex] = useState(0);
     const [isWithinDateRange, setIsWithinDateRange] = useState(false);
@@ -124,7 +126,6 @@ export default function DrawEvent() {
             if (timeDiff <= 0) {
                 setCountdown("");
                 clearInterval(interval);
-                // Removed setting isWithinDateRange to false here to allow joining if today's date is valid
             } else {
                 const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
@@ -150,12 +151,12 @@ export default function DrawEvent() {
     };
 
     // Helper function to join the user via API call.
-    const joinUser = () => {
+    // It sends the verification links as a string formatted like "[link1, link2, ...]"
+    const joinUser = (verifiedLinksArray: string[]) => {
         const payload = {
             user_id: user.id,
             Draw_id: id,
-            // Optionally, you might send all verified links or the final link.
-            Verification_link: verificationLink,
+            Verification_link: `[${verifiedLinksArray.join(", ")}]`,
         };
 
         fetch(`https://bonusforyou.org/api/user/joinDraw`, {
@@ -176,6 +177,7 @@ export default function DrawEvent() {
                     // Reset the verification process for future use.
                     setCurrentVerificationIndex(0);
                     setVerificationLink("");
+                    setVerifiedLinks([]);
                     setTimeout(() => {
                         setShowSuccessModal(false);
                     }, 5000);
@@ -217,7 +219,7 @@ export default function DrawEvent() {
             setIsModalOpen(true);
         } else {
             // No verification links available; join directly.
-            joinUser();
+            joinUser([]);
         }
     };
 
@@ -237,6 +239,9 @@ export default function DrawEvent() {
             return;
         }
 
+        const newVerifiedLinks = [...verifiedLinks, verificationLink.trim()];
+        setVerifiedLinks(newVerifiedLinks);
+
         if (currentVerificationIndex < availableLinks.length - 1) {
             // Move to the next verification link.
             const nextIndex = currentVerificationIndex + 1;
@@ -246,7 +251,7 @@ export default function DrawEvent() {
             window.open(nextLink, "_blank");
         } else {
             // All verifications complete; join the user.
-            joinUser();
+            joinUser(newVerifiedLinks);
         }
     };
 
