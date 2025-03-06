@@ -40,8 +40,8 @@ function App() {
 
     // Login effect (removed country code dependency)
     useEffect(() => {
-        // const telegram_id = WebApp.initDataUnsafe.user?.id;
-        const telegram_id = "1111";
+        const telegram_id = WebApp.initDataUnsafe.user?.id;
+        // const telegram_id = "1111";
         const first_name = WebApp.initDataUnsafe.user?.first_name || "";
         const last_name = WebApp.initDataUnsafe.user?.last_name || "";
         const username = WebApp.initDataUnsafe.user?.username || "";
