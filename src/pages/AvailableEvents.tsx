@@ -7,23 +7,56 @@ import WebApp from "@twa-dev/sdk";
 
 import { Draw } from "../types/type";
 
+type Country = {
+    id: number;
+    country_name: string;
+    country_code: string;
+};
+
 export default function AvailableEvents() {
-    const [draws, setDraws] = useState<Draw[] | null>(null);
     const userContext = useContext(UserContext);
     const user = userContext?.user;
-    const countryName = user?.country;
     const navigate = useNavigate();
 
+    // Local state for the list of countries and the selected country
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [selectedCountry, setSelectedCountry] = useState<string>(
+        user?.country || ""
+    );
+    const [draws, setDraws] = useState<Draw[] | null>(null);
+
+    // Fetch countries list on mount
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await fetch(
+                    "https://bonusforyou.org/api/countries"
+                );
+                const data = await response.json();
+                if (data.status) {
+                    setCountries(data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching countries:", error);
+            }
+        };
+
+        fetchCountries();
+    }, []);
+
+    // Fetch draws whenever user id or selectedCountry changes
     useEffect(() => {
         const fetchDraws = async () => {
             try {
-                if (!user?.id) {
-                    console.error("User ID not available, cannot fetch data");
+                if (!user?.id || !selectedCountry) {
+                    console.error(
+                        "User ID or selected country not available, cannot fetch data"
+                    );
                     return;
                 }
                 const payload = {
                     user_id: user.id,
-                    contry_id: countryName,
+                    contry_id: selectedCountry,
                 };
                 const response = await fetch(
                     "https://bonusforyou.org/api/user/countrywisedraw",
@@ -54,14 +87,16 @@ export default function AvailableEvents() {
         };
 
         fetchDraws();
+    }, [user?.id, selectedCountry]);
 
+    // Set up back button only once
+    useEffect(() => {
         WebApp.BackButton.show();
         WebApp.BackButton.onClick(handleBack);
-
         return () => {
             WebApp.BackButton.offClick(handleBack);
         };
-    }, [user?.id]);
+    }, []);
 
     const handleBack = () => {
         window.history.back();
@@ -74,8 +109,27 @@ export default function AvailableEvents() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Available Events
                 </div>
-                <section className="mt-4 px-2">
-                    <div className="p-2 rounded-md text-center shadow-md">
+                {/* Container with fixed width */}
+                <div className="w-[92vw] mx-auto mt-4">
+                    {/* Dropdown now takes full width of container */}
+                    <select
+                        value={selectedCountry}
+                        onChange={(e) => setSelectedCountry(e.target.value)}
+                        className="w-full p-2 rounded border border-black bg-yellow-300 text-black"
+                    >
+                        <option value="">Select a country</option>
+                        {countries.map((country) => (
+                            <option
+                                key={country.id}
+                                value={country.country_name}
+                            >
+                                {country.country_name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <section className="mt-4">
+                    <div className="p-3 rounded-md text-center">
                         {draws?.length === 0 ? (
                             <h2>No Data to Display</h2>
                         ) : (

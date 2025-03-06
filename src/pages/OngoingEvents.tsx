@@ -7,18 +7,72 @@ import WebApp from "@twa-dev/sdk";
 
 import { Draw } from "../types/type";
 
+type Country = {
+    id: number;
+    country_name: string;
+    country_key: string;
+    image: string | null;
+    code: string | null;
+    country_code: string;
+    country_2_char_code: string;
+    activation: number;
+    created_at: string;
+    updated_at: string;
+};
+
 export default function OngoingEvents() {
     const [draws, setDraws] = useState<Draw[]>([]);
+    const [countries, setCountries] = useState<Country[]>([]);
     const userContext = useContext(UserContext);
     const user = userContext?.user;
-    const countryName = user?.country;
 
+    // Local state for the selected country.
+    // Initialize as empty and update after fetching countries.
+    const [selectedCountry, setSelectedCountry] = useState<string>("");
+
+    // Fetch the list of countries and set the default selection based on the user's current country.
     useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await fetch(
+                    "https://bonusforyou.org/api/countries"
+                );
+                const data = await response.json();
+                if (data.status) {
+                    setCountries(data.data);
+                    // If user has a country (stored as country name), find the matching country code.
+                    if (user?.country) {
+                        const found = data.data.find(
+                            (c: Country) =>
+                                c.country_name.toLowerCase() ===
+                                user.country.toLowerCase()
+                        );
+                        if (found) {
+                            setSelectedCountry(found.country_code);
+                        } else {
+                            setSelectedCountry("");
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching countries:", error);
+            }
+        };
+
+        fetchCountries();
+    }, [user]);
+
+    // Fetch the running draws whenever the user or selected country changes.
+    useEffect(() => {
+        if (!user?.id) {
+            console.error("User ID not available, cannot fetch data");
+            return;
+        }
         const fetchDraws = async () => {
             try {
                 const payload = {
                     user_id: user.id,
-                    contry_id: countryName,
+                    contry_id: selectedCountry,
                 };
                 const response = await fetch(
                     "https://bonusforyou.org/api/user/countrywiserunningdraw",
@@ -36,9 +90,10 @@ export default function OngoingEvents() {
                     );
                 }
                 const data = await response.json();
-                setDraws(data.data);
+                setDraws(data.data || []); // ensure draws is always an array
             } catch (error) {
                 console.error("Error fetching draws:", error);
+                setDraws([]); // fallback to empty array
             }
         };
 
@@ -48,7 +103,18 @@ export default function OngoingEvents() {
         WebApp.BackButton.onClick(() => {
             window.history.back();
         });
-    }, [user.id, countryName]);
+
+        return () => {
+            WebApp.BackButton.offClick(() => {
+                window.history.back();
+            });
+        };
+    }, [user?.id, selectedCountry]);
+
+    // Update the selected country when the user chooses a different one.
+    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCountry(e.target.value);
+    };
 
     return (
         <div className="bg-yellow-300">
@@ -57,7 +123,27 @@ export default function OngoingEvents() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Ongoing Events
                 </div>
-                <section className="mt-2">
+                <div className="w-[92vw] mx-auto mt-4">
+                    <select
+                        value={selectedCountry}
+                        onChange={handleCountryChange}
+                        className="w-full p-2 rounded border border-black bg-yellow-300 text-black"
+                    >
+                        {/* Only show the default option if no country is selected */}
+                        {selectedCountry === "" && (
+                            <option value="">Select Country</option>
+                        )}
+                        {countries.map((country) => (
+                            <option
+                                key={country.id}
+                                value={country.country_code}
+                            >
+                                {country.country_name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <section className="mt-4">
                     <div className="p-2 rounded-md text-center shadow-md">
                         {draws.length === 0 ? (
                             <h2>No Data to Display</h2>
