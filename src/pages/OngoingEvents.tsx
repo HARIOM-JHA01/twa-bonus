@@ -126,11 +126,11 @@ export default function OngoingEvents() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Ongoing Events
                 </div>
-                <div className="w-[92vw] mx-auto mt-4">
+                <div className="w-[95vw] mx-auto mt-2">
                     <select
                         value={selectedCountry}
                         onChange={handleCountryChange}
-                        className="w-full p-2 rounded border border-black bg-yellow-300 text-black"
+                        className="w-full p-2 rounded border-2 border-black text-white bg-gray-400 font-bold text-lg"
                     >
                         {selectedCountry === "" && (
                             <option value="">Select Country</option>
@@ -145,10 +145,10 @@ export default function OngoingEvents() {
                         ))}
                     </select>
                 </div>
-                <section className="mt-4">
-                    <div className="p-2 rounded-md text-center shadow-md">
+                <section className="mt-1">
+                    <div className="p-2 rounded-md shadow-md">
                         {draws.length === 0 ? (
-                            <h2>No Data to Display</h2>
+                            <h2 className="text-center">No Data to Display</h2>
                         ) : (
                             draws.map((draw) => (
                                 <DrawCard key={draw.id} draw={draw} />
@@ -180,12 +180,8 @@ export const DrawCard: React.FC<DrawCardProps> = ({ draw }) => {
                 className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto"
             />
             <div className="flex justify-between">
-                <h2 className="text-black ps-3">
-                    Start On: {new Date(draw.start_date).toLocaleDateString()}
-                </h2>
-                <h2 className="text-black pe-3">
-                    End On: {new Date(draw.end_date).toLocaleDateString()}
-                </h2>
+                <h2 className="text-black ps-3">Start On: {draw.start_date}</h2>
+                <h2 className="text-black ">End On: {draw.end_date}</h2>
             </div>
         </div>
     );

@@ -110,12 +110,12 @@ export default function AvailableEvents() {
                     Available Events
                 </div>
                 {/* Container with fixed width */}
-                <div className="w-[92vw] mx-auto mt-4">
+                <div className="w-[95vw] mx-auto mt-2">
                     {/* Dropdown now takes full width of container */}
                     <select
                         value={selectedCountry}
                         onChange={(e) => setSelectedCountry(e.target.value)}
-                        className="w-full p-2 rounded border border-black bg-yellow-300 text-black"
+                        className="w-full p-2 rounded border-2 border-black bg-gray-400 text-white font-bold text-lg"
                     >
                         <option value="">Select a country</option>
                         {countries.map((country) => (
@@ -128,7 +128,7 @@ export default function AvailableEvents() {
                         ))}
                     </select>
                 </div>
-                <section className="mt-4">
+                <section className="mt-1">
                     <div className="p-3 rounded-md text-center">
                         {draws?.length === 0 ? (
                             <h2>No Data to Display</h2>

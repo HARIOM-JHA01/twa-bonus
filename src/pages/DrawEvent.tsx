@@ -153,11 +153,16 @@ export default function DrawEvent() {
     // Helper function to join the user via API call.
     // It sends the verification links as a string formatted like "[link1, link2, ...]"
     const joinUser = (verifiedLinksArray: string[]) => {
+        const lowercaseVerifiedLinks = verifiedLinksArray.map((link) =>
+            link.toLowerCase()
+        );
+
         const payload = {
             user_id: user.id,
             Draw_id: id,
-            Verification_link: `[${verifiedLinksArray.join(", ")}]`,
+            Verification_link: `[${lowercaseVerifiedLinks.join(", ")}]`,
         };
+        console.log("Joining user with payload:", payload);
 
         fetch(`https://bonusforyou.org/api/user/joinDraw`, {
             method: "POST",
@@ -227,7 +232,11 @@ export default function DrawEvent() {
         const availableLinks = getVerificationLinks();
         const expectedLink = availableLinks[currentVerificationIndex];
 
-        if (verificationLink.trim() !== expectedLink) {
+        // Convert both links to lowercase for case-insensitive comparison
+        if (
+            verificationLink.trim().toLowerCase() !==
+            expectedLink?.toLowerCase()
+        ) {
             setShowErrorModal(true);
             setErrorMessage(
                 "Verification link does not match. Please try again."
@@ -236,7 +245,7 @@ export default function DrawEvent() {
             return;
         }
 
-        const newVerifiedLinks = [...verifiedLinks, verificationLink.trim()];
+        const newVerifiedLinks = [...verifiedLinks, verificationLink];
         setVerifiedLinks(newVerifiedLinks);
 
         if (currentVerificationIndex < availableLinks.length - 1) {

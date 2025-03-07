@@ -50,8 +50,8 @@ export default function AvailableEvents() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Participated Events
                 </div>
-                <section className="mt-4 px-2">
-                    <div className="p-2 text-center rounded-md shadow-md">
+                <section className="mt-4">
+                    <div className="p-2 rounded-md shadow-md">
                         {error && <p className="text-red-500">{error}</p>}
                         {draws.length === 0 ? (
                             <h2>No Data to Display</h2>
@@ -77,21 +77,17 @@ export const DrawCard: React.FC<DrawCardProps> = ({ draw }) => {
     return (
         <div
             className="flex gap-1 flex-col border-2 border-black rounded-lg mb-2 cursor-pointer"
-            onClick={() => navigate(`/participated-draw-event/${draw.id}`)}
+            onClick={() => navigate(`/draw-event/${draw.id}`)}
         >
-            <h2 className="text-black ps-3">{draw.draw_name}</h2>
+            <h2 className="text-black ps-3 font-bold">{draw.draw_name}</h2>
             <img
                 src={draw.draw_image}
                 alt={draw.draw_name}
-                className="w-full h-full object-cover rounded-lg p-1"
+                className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto"
             />
             <div className="flex justify-between">
-                <h2 className="text-black ps-3">
-                    Start Date: {new Date(draw.start_date).toLocaleDateString()}
-                </h2>
-                <h2 className="text-black pe-3">
-                    End Date: {new Date(draw.end_date).toLocaleDateString()}
-                </h2>
+                <h2 className="text-black ps-3">Start On: {draw.start_date}</h2>
+                <h2 className="text-black ">End On: {draw.end_date}</h2>
             </div>
         </div>
     );
