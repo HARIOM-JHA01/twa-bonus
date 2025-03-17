@@ -311,32 +311,32 @@ export default function DrawEvent() {
                     ))}
                 </ul>
                 {rewardDetail.Prize_list.some(
-                    (prize) => Number(prize.e_no_of_prize) !== 0
+                    (prize) => Number(prize.e_no_of_prize || "0") !== 0
                 ) && (
                     <>
                         <h2 className="text-center text-black font-bold">
                             Early Birds Prize:
                         </h2>
                         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-center text-black p-2 rounded-lg border border-black">
-                            {rewardDetail.Prize_list.map(
-                                (prize, index) =>
-                                    Number(prize.e_no_of_prize) !== 0 && (
-                                        <li
-                                            key={index}
-                                            className="flex justify-between items-center"
-                                        >
-                                            <div className="flex-1">
-                                                {prize.e_no_win_prize}
-                                            </div>
-                                            <div className="flex-1">
-                                                {prize.e_no_of_prize}
-                                            </div>
-                                            <div className="flex-1">
-                                                {prize.e_prize}
-                                            </div>
-                                        </li>
-                                    )
-                            )}
+                            {rewardDetail.Prize_list.filter(
+                                (prize) =>
+                                    Number(prize.e_no_of_prize || "0") !== 0
+                            ).map((prize, index) => (
+                                <li
+                                    key={index}
+                                    className="flex justify-between items-center"
+                                >
+                                    <div className="flex-1">
+                                        {prize.e_no_win_prize}
+                                    </div>
+                                    <div className="flex-1">
+                                        {prize.e_no_of_prize}
+                                    </div>
+                                    <div className="flex-1">
+                                        {prize.e_prize}
+                                    </div>
+                                </li>
+                            ))}
                         </ul>
                     </>
                 )}
@@ -350,6 +350,12 @@ export default function DrawEvent() {
                         __html: rewardDetail.draw_detail || "",
                     }}
                 />
+                <h2 className="text-center text-black font-bold">
+                    Draw to be performed on:
+                </h2>
+                <p className="text-center text-black border border-black p-2 rounded-lg text-lg">
+                    {new Date(rewardDetail.winner_declare_date).toDateString()}
+                </p>
                 {!hasJoined && isWithinDateRange && (
                     <div className="flex justify-center items-center my-3">
                         <button

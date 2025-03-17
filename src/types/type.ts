@@ -61,7 +61,6 @@ export type PrizeItem = {
     pcheck: number;
 };
 
-
 export type IndividualDraw = {
     id: number;
     poster_name: string;
@@ -74,6 +73,7 @@ export type IndividualDraw = {
     status: string;
     join_user: number;
     draw_status: number;
+    winner_declare_date: string;
     channel_link: string | null;
     prize_detail_link: string | null;
     draw_detail_link: string | null;
