@@ -296,7 +296,6 @@ export default function DrawEvent() {
                 >
                     {rewardDetail.prize_detail_link || ""}
                 </a>
-
                 <h2 className="text-center text-black font-bold">Prizes:</h2>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-center text-black p-2 rounded-lg border border-black">
                     {rewardDetail.Prize_list.map((prize, index) => (
@@ -340,7 +339,6 @@ export default function DrawEvent() {
                         </ul>
                     </>
                 )}
-
                 <h2 className="text-center text-black font-bold">
                     Event Brief:
                 </h2>
@@ -354,7 +352,14 @@ export default function DrawEvent() {
                     Draw to be performed on:
                 </h2>
                 <p className="text-center text-black border border-black p-2 rounded-lg text-lg">
-                    {new Date(rewardDetail.winner_declare_date).toDateString()}
+                    {new Date(
+                        rewardDetail.winner_declare_date
+                    ).toLocaleDateString("en-IN", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                    })}
                 </p>
                 {!hasJoined && isWithinDateRange && (
                     <div className="flex justify-center items-center my-3">
@@ -376,7 +381,6 @@ export default function DrawEvent() {
                         {countdown}
                     </h3>
                 )}
-
                 {!hasJoined && (
                     <p className="text-center text-black text-sm p-4 rounded-lg">
                         View Events Post Detail, Join Channel and Copy Events
@@ -396,7 +400,6 @@ export default function DrawEvent() {
                     <img className="w-6 h-6" src="/share.png" alt="Share" />
                 </div>
                 <Footer />
-
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
                         <div className="bg-yellow-300 p-6 rounded-lg flex flex-col items-center">
