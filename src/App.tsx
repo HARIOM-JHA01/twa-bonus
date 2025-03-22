@@ -18,6 +18,7 @@ function App() {
         useState<PromotionBanner | null>(null);
     const [loading, setLoading] = useState(true);
     const [loginFailed, setLoginFailed] = useState(false);
+    const [countryCode, setCountryCode] = useState<string | null>(null);
 
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -36,6 +37,14 @@ function App() {
             .catch((error) =>
                 console.error("Error fetching promotion banner:", error)
             );
+        fetch("https://bonusforyou.org/api/user/get-country")
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.countryCode) {
+                    setCountryCode(data.countryCode);
+                }
+            })
+            .catch((error) => console.error("Error fetching country:", error));
     }, []);
 
     // Login effect (removed country code dependency)
@@ -57,6 +66,7 @@ function App() {
                     first_name,
                     last_name,
                     username,
+                    countryCode,
                 }),
             })
                 .then((response) => response.json())

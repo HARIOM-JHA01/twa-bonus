@@ -397,7 +397,11 @@ export default function DrawEvent() {
                         );
                     }}
                 >
-                    <img className="w-6 h-6" src="/share.png" alt="Share" />
+                    <img
+                        className="w-6 h-6"
+                        src="/bonus-monster/share.png"
+                        alt="Share"
+                    />
                 </div>
                 <Footer />
                 {isModalOpen && (

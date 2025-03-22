@@ -168,10 +168,44 @@ const DrawCard: React.FC<DrawCardProps> = ({ draw, navigate }) => {
             />
             <div className="flex justify-between">
                 <h2 className="text-black ps-3">
-                    Start On: {draw.start_date || "Not Available"}
+                    Start On:{" "}
+                    {draw.start_date
+                        ? (() => {
+                              const dateObj = new Date(draw.start_date);
+                              // Format the date as dd-mm-yyyy
+                              const datePart = dateObj
+                                  .toLocaleDateString("en-GB")
+                                  .replace(/\//g, "-");
+                              // Format the time as hh:mm (24-hour format)
+                              const timePart = dateObj.toLocaleTimeString(
+                                  "en-GB",
+                                  {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                  }
+                              );
+                              return `${datePart} ${timePart} GMT`;
+                          })()
+                        : "Not Available"}
                 </h2>
                 <h2 className="text-black pe-3">
-                    End On: {draw.end_date || "Not Available"}
+                    End On:{" "}
+                    {draw.end_date
+                        ? (() => {
+                              const dateObj = new Date(draw.end_date);
+                              const datePart = dateObj
+                                  .toLocaleDateString("en-GB")
+                                  .replace(/\//g, "-");
+                              const timePart = dateObj.toLocaleTimeString(
+                                  "en-GB",
+                                  {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                  }
+                              );
+                              return `${datePart} ${timePart} GMT`;
+                          })()
+                        : "Not Available"}
                 </h2>
             </div>
         </div>

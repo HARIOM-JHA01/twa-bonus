@@ -29,7 +29,9 @@ const Root = () => {
     }, []);
 
     return (
-        <BrowserRouter>
+    
+        <BrowserRouter basename="/bonus-monster">
+
             <Routes>
                 <Route path="/" element={<App />} />
                 <Route path="/available-rewards" element={<AvailableEvents />} />
