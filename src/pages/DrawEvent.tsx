@@ -156,11 +156,12 @@ export default function DrawEvent() {
         const lowercaseVerifiedLinks = verifiedLinksArray.map((link) =>
             link.toLowerCase()
         );
-
+        console.log(lowercaseVerifiedLinks);
         const payload = {
             user_id: user.id,
             Draw_id: id,
-            Verification_link: `[${lowercaseVerifiedLinks.join(", ")}]`,
+            // Verification_link: `[${lowercaseVerifiedLinks.join(", ")}]`,
+            Verification_link: rewardDetail?.verifiaction_link_0,
         };
         console.log("Joining user with payload:", payload);
 
