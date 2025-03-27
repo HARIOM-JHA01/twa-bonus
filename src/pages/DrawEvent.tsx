@@ -444,7 +444,7 @@ export default function DrawEvent() {
             setTimeout(() => setShowErrorModal(false), 5000);
             return;
         }
-        console.log("Joining user with verified links:", verifiedLinksArray);
+        console.log("verified links:", verifiedLinksArray);
         const payload = {
             user_id: user.id,
             Draw_id: id,
