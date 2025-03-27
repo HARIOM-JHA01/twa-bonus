@@ -7,9 +7,9 @@ const Header = () => {
     const router = useNavigate();
     const { i18n } = useTranslation();
     const { t } = useTranslation();
-   const logoImage = "/reward-monster/bonus-logo.png";
-const privacyImage = "/reward-monster/privacy.png";
-	const languageImage = "/reward-monster/hnkf.png";
+    const logoImage = "/bonus-monster/bonus-logo.png";
+    const privacyImage = "/bonus-monster/privacy.png";
+    const languageImage = "/bonus-monster/hnkf.png";
 
     const handleToggleLanguage = () => {
         const newLanguage = i18n.language === "en" ? "zh" : "en";
