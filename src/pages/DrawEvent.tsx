@@ -444,10 +444,7 @@ export default function DrawEvent() {
             setTimeout(() => setShowErrorModal(false), 5000);
             return;
         }
-
-        // *** IMPORTANT: Verify this payload format matches your API expectation ***
-        // This uses the first verification link, same as your original code.
-        // If the API needs all verified links, adjust this payload.
+        console.log("Joining user with verified links:", verifiedLinksArray);
         const payload = {
             user_id: user.id,
             Draw_id: id,
