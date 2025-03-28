@@ -27,6 +27,7 @@ const Header = () => {
                 width={"32px"}
                 height={"30px"}
                 className="flex-shrink-0 mr-14"
+                onClick={() => router("/")}
             />
             <h1
                 onClick={() => router("/")}
