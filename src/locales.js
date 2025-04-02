@@ -134,11 +134,11 @@ const resources = {
                 },
             },
             app: {
-                availableEvents: "可用活动",
-                ongoingEvents: "正在进行的活动",
-                participatedEvents: "参与的活动",
-                prizeIWon: "我赢得的奖品",
-                myProfile: "我的资料",
+                availableEvents: "可參加的活動",
+                ongoingEvents: "正進行的活動",
+                participatedEvents: "我參加的活動",
+                prizeIWon: "我獲得的獎品",
+                myProfile: "我的檔案",
             },
             event: {
                 eventTitle: "活动标题",

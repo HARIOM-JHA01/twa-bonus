@@ -143,7 +143,11 @@ export const DrawCard: React.FC<DrawCardProps> = ({ draw, onCardClick }) => {
                 </h2>
 
                 <div className="cursor-pointer" onClick={handleGiftBoxClick}>
-                    <img src={giftBoxPath} alt="gift box" className="w-7 h-7" />
+                    <img
+                        src={giftBoxPath}
+                        alt="gift box"
+                        className="w-7 h-7 pe-2"
+                    />
                 </div>
                 <h2 className="text-black pe-3">
                     End On:{" "}
