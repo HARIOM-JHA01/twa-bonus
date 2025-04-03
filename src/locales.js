@@ -128,7 +128,7 @@ const resources = {
     zh: {
         translation: {
             common: {
-                appName: "獎金給你",
+                appName: "獎  你",
                 button: {
                     toggleLanguage: "切換語言",
                 },

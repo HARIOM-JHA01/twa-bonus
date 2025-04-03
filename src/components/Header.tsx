@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import React from "react";
 
-const Header = () => {
+const Header = React.memo(() => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const router = useNavigate();
     const { i18n } = useTranslation();
@@ -98,6 +99,6 @@ const Header = () => {
             </div>
         </header>
     );
-};
+});
 
 export default Header;
