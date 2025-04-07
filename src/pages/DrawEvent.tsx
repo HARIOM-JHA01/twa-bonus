@@ -827,27 +827,26 @@ export default function DrawEvent() {
                     </p>
                 )}
 
-                {/* Share Button (Using image path from your original code) */}
+                {/* Share Button (commented out)
                 <div
-                    className="rounded-full w-12 h-12 bg-red-500 justify-center items-center flex mx-auto"
-                    onClick={() => {
-                        navigator.clipboard.writeText(window.location.href);
-                        WebApp.showAlert(
-                            "Event link has been copied successfully. Paste it to telegram to share it with your friends"
-                        );
-                    }}
-                    // Add accessibility attributes
-                    role="button"
-                    tabIndex={0}
-                    title="Copy event link"
+                className="rounded-full w-12 h-12 bg-red-500 justify-center items-center flex mx-auto"
+                onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                WebApp.showAlert(
+                    "Event link has been copied successfully. Paste it to telegram to share it with your friends"
+                );
+                }}
+                role="button"
+                tabIndex={0}
+                title="Copy event link"
                 >
-                    {/* Path from your DrawEvent */}
-                    <img
-                        className="w-6 h-6"
-                        src="/bonus-monster/share.png"
-                        alt="Share"
-                    />
+                <img
+                className="w-6 h-6"
+                src="/bonus-monster/share.png"
+                alt="Share"
+                />
                 </div>
+                */}
 
                 <Footer />
 
