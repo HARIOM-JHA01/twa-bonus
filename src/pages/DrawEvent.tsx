@@ -747,7 +747,7 @@ export default function DrawEvent() {
                               year: "numeric",
                               month: "long",
                               day: "numeric",
-                          })
+                          }) + " GMT"
                         : "Date not specified"}
                 </p>
 

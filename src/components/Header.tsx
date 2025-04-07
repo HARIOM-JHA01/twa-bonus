@@ -18,7 +18,7 @@ const Header = React.memo(() => {
     };
 
     return (
-        <header className="flex pt-3 pl-3 pr-2 bg-gray-700 pb-3  relative z-50">
+        <header className="flex justify-between pt-3 pl-3 pr-2 bg-gray-700 pb-3  relative z-50">
             <img
                 src={logoImage}
                 alt="Bonus For You Logo"
