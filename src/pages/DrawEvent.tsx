@@ -747,7 +747,16 @@ export default function DrawEvent() {
                               year: "numeric",
                               month: "long",
                               day: "numeric",
-                          }) + " GMT"
+                          }) +
+                          " @ " +
+                          new Date(
+                              rewardDetail.winner_declare_date
+                          ).toLocaleTimeString("en-IN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: false,
+                          }) +
+                          " GMT"
                         : "Date not specified"}
                 </p>
 
