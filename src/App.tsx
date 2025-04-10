@@ -163,9 +163,9 @@ function App() {
                         >
                             {t("app.myProfile")}
                         </div>
+                        <Footer />
                     </section>
                 </main>
-                <Footer />
             </div>
         </>
     );

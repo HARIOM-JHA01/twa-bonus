@@ -12,24 +12,34 @@ type AdvertiseBanner = {
 };
 
 const Footer = () => {
-    const [randomBanner, setRandomBanner] = useState<AdvertiseBanner | null>(null);
+    const [randomBanner, setRandomBanner] = useState<AdvertiseBanner | null>(
+        null
+    );
 
     useEffect(() => {
         fetch("https://bonusforyou.org/api/advertiseBanner")
             .then((res) => res.json())
             .then((data) => {
                 if (data.status && data.data.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * data.data.length);
+                    const randomIndex = Math.floor(
+                        Math.random() * data.data.length
+                    );
                     setRandomBanner(data.data[randomIndex]);
                 }
             })
-            .catch((error) => console.error("Error fetching advertise banners:", error));
+            .catch((error) =>
+                console.error("Error fetching advertise banners:", error)
+            );
     }, []);
 
     return (
-        <section className="flex flex-col gap-4 mt-4 items-center pb-5">
+        <section className="flex flex-col gap-4 items-center pb-5">
             {randomBanner && (
-                <a href={randomBanner.link} target="_blank" rel="noopener noreferrer">
+                <a
+                    href={randomBanner.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     <img
                         src={randomBanner.image}
                         alt={`Advertisement ${randomBanner.id}`}
