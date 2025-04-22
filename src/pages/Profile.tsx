@@ -31,21 +31,24 @@ export default function Profile() {
     return (
         <div className="bg-yellow-300">
             <Header />
-            <main className="bg-yellow-300  flex flex-col items-center justify-center h-[80vh] w-full">
+            <main className="bg-yellow-300 flex flex-col items-center w-full min-h-screen">
                 {error ? (
                     <h1 className="text-red-600 font-bold">{error}</h1>
                 ) : (
                     <>
                         {isLoggedIn ? (
-                            <div className="flex flex-col justify-center gap-4 w-[90%] max-w-md bg-yellow-300  rounded-lg shadow-md">
-                                <div className="flex flex-col">
+                            <div className="flex flex-col gap-4 max-w-md bg-yellow-300 rounded-lg w-full">
+                                <div className="text-center text-lg font-bold text-white bg-gray-500 w-full">
+                                    My Profile
+                                </div>
+                                <div className="flex flex-col px-4">
                                     <img
                                         src={profileImage}
                                         alt="Bonus For You Logo"
                                         onError={(e: any) => {
                                             e.target.src = "fallback-logo.png";
                                         }}
-                                        className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-5"
+                                        className="rounded-lg shadow-lg w-full h-[120px] mb-5"
                                     />
 
                                     <label className="font-semibold text-xl text-black">
@@ -57,7 +60,7 @@ export default function Profile() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col">
+                                <div className="flex flex-col px-4">
                                     <label className="font-semibold text-xl text-black">
                                         Telegram ID
                                     </label>
@@ -66,7 +69,7 @@ export default function Profile() {
                                             "Not provided"}
                                     </div>
                                 </div>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col px-4">
                                     <label className="font-semibold text-xl text-black">
                                         Country
                                     </label>
@@ -74,7 +77,7 @@ export default function Profile() {
                                         {user.country || ""}
                                     </div>
                                 </div>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col px-4 pb-4">
                                     <label className="font-semibold text-xl text-black">
                                         Participant Code
                                     </label>
