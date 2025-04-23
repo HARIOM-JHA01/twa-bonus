@@ -34,7 +34,7 @@ export default function Profile() {
             <div className="text-center text-lg font-bold text-white bg-gray-500">
                 My Profile
             </div>
-            <main className="bg-yellow-300 flex flex-col items-center w-full">
+            <main className="bg-yellow-300 flex flex-col items-center w-full pt-4">
                 {error ? (
                     <h1 className="text-red-600 font-bold">{error}</h1>
                 ) : (
