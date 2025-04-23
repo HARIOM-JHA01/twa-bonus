@@ -29,18 +29,18 @@ export default function Profile() {
     }, []);
 
     return (
-        <div className="bg-yellow-300">
+        <div className="bg-yellow-300 min-h-screen">
             <Header />
-            <main className="bg-yellow-300 flex flex-col items-center w-full min-h-screen">
+            <div className="text-center text-lg font-bold text-white bg-gray-500">
+                My Profile
+            </div>
+            <main className="bg-yellow-300 flex flex-col items-center w-full">
                 {error ? (
                     <h1 className="text-red-600 font-bold">{error}</h1>
                 ) : (
                     <>
                         {isLoggedIn ? (
                             <div className="flex flex-col gap-4 max-w-md bg-yellow-300 rounded-lg w-full">
-                                <div className="text-center text-lg font-bold text-white bg-gray-500 w-full">
-                                    My Profile
-                                </div>
                                 <div className="flex flex-col px-4">
                                     <img
                                         src={profileImage}
