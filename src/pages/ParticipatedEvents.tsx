@@ -10,7 +10,7 @@ export default function AvailableEvents() {
     const [draws, setDraws] = useState<Draw[]>([]);
     const [error, setError] = useState<string | null>(null);
     const userContext = useContext(UserContext);
-    const user = userContext?.user || { id: 72 }; // Default user ID
+    const user = userContext?.user; // Default user ID
 
     useEffect(() => {
         fetch(
@@ -76,7 +76,7 @@ export const DrawCard: React.FC<DrawCardProps> = ({ draw }) => {
     const navigate = useNavigate();
     return (
         <div
-            className="flex gap-1 flex-col border-2 border-black rounded-lg mb-2 cursor-pointer"
+            className="flex gap-1 flex-col border-2 text-center border-black rounded-lg mb-2 cursor-pointer"
             onClick={() => navigate(`/draw-event/${draw.id}`)}
         >
             <h2 className="text-black ps-3 font-bold">{draw.draw_name}</h2>
