@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import BannerComponent from "../components/BannerComponent";
 import { useState, useEffect, useContext } from "react";
 import WebApp from "@twa-dev/sdk";
 import { UserContext } from "../context/UserContext.js";
@@ -34,6 +35,14 @@ export default function Profile() {
             <div className="text-center text-lg font-bold text-white bg-gray-500">
                 My Profile
             </div>
+
+            {/* Top Banner for Participants My Profile */}
+            <BannerComponent
+                pageName="Participants My Profile"
+                position="top"
+                className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mt-2"
+            />
+
             <main className="bg-yellow-300 flex flex-col items-center w-full pt-4">
                 {error ? (
                     <h1 className="text-red-600 font-bold">{error}</h1>
@@ -45,9 +54,6 @@ export default function Profile() {
                                     <img
                                         src={profileImage}
                                         alt="Bonus For You Logo"
-                                        onError={(e: any) => {
-                                            e.target.src = "fallback-logo.png";
-                                        }}
                                         className="rounded-lg shadow-lg w-full h-[120px] mb-5"
                                     />
 
@@ -85,6 +91,13 @@ export default function Profile() {
                                         {user.uniqueId || ""}
                                     </div>
                                 </div>
+
+                                {/* Bottom Banner for Participants My Profile */}
+                                <BannerComponent
+                                    pageName="Participants My Profile"
+                                    position="bottom"
+                                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-4"
+                                />
                             </div>
                         ) : (
                             <div>

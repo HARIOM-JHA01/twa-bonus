@@ -1,22 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-type AdvertiseBanner = {
-    id: number;
-    image: string;
-    link: string;
-    status: string;
-    start_date: string;
-    end_date: string;
-    created_at: string;
-    updated_at: string;
-};
+// type AdvertiseBanner = {
+//     id: number;
+//     image: string;
+//     link: string;
+//     status: string;
+//     start_date: string;
+//     end_date: string;
+//     created_at: string;
+//     updated_at: string;
+// };
 
 const Footer = () => {
-    const [randomBanner, setRandomBanner] = useState<AdvertiseBanner | null>(
-        null
-    );
+    // const [randomBanner, setRandomBanner] = useState<AdvertiseBanner | null>(
+    //     null
+    // );
 
     useEffect(() => {
+        // COMMENTED OUT: Advertisement banner fetching
+        /*
         fetch("https://bonusforyou.org/api/advertiseBanner")
             .then((res) => res.json())
             .then((data) => {
@@ -30,10 +32,13 @@ const Footer = () => {
             .catch((error) =>
                 console.error("Error fetching advertise banners:", error)
             );
+        */
     }, []);
 
     return (
         <section className="flex flex-col gap-4 items-center pb-5">
+            {/* COMMENTED OUT: Advertisement banner display */}
+            {/*
             {randomBanner && (
                 <a
                     href={randomBanner.link}
@@ -47,6 +52,7 @@ const Footer = () => {
                     />
                 </a>
             )}
+            */}
         </section>
     );
 };

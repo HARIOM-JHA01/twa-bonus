@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import React from "react";
@@ -8,30 +8,42 @@ const Header = React.memo(() => {
     const router = useNavigate();
     const { i18n } = useTranslation();
     const { t } = useTranslation();
+    
+    // Move images to constants to prevent recreation on every render
     const logoImage = "/bonus-monster/bonus-logo.png";
     const privacyImage = "/bonus-monster/privacy.png";
     const languageImage = "/bonus-monster/hnkf.png";
 
-    const handleToggleLanguage = () => {
+    const handleToggleLanguage = useCallback(() => {
         const newLanguage = i18n.language === "en" ? "zh" : "en";
         i18n.changeLanguage(newLanguage);
-    };
+    }, [i18n]);
+
+    const handleNavigation = useCallback((path: string) => {
+        setDropdownOpen(false);
+        router(path);
+    }, [router]);
+
+    const handleDropdownToggle = useCallback(() => {
+        setDropdownOpen(prev => !prev);
+    }, []);
+
+    const handleLogoClick = useCallback(() => {
+        router("/");
+    }, [router]);
 
     return (
         <header className="flex justify-between pt-3 pl-3 pr-2 bg-gray-700 pb-3  relative z-50">
             <img
                 src={logoImage}
                 alt="Bonus For You Logo"
-                onError={(e: any) => {
-                    e.target.src = "fallback-logo.png";
-                }}
                 width={"32px"}
                 height={"30px"}
                 className="flex-shrink-0 mr-14"
-                onClick={() => router("/")}
+                onClick={handleLogoClick}
             />
             <h1
-                onClick={() => router("/")}
+                onClick={handleLogoClick}
                 className="text-white text-2xl mr-8 cursor-pointer text-overflow-ellipsis whitespace-nowrap overflow-hidden"
             >
                 {t("common.appName")}
@@ -51,7 +63,7 @@ const Header = React.memo(() => {
                     alt="Privacy and More Options"
                     width={"30px"}
                     height={"30px"}
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    onClick={handleDropdownToggle}
                     className="cursor-pointer"
                     aria-haspopup="true"
                     aria-expanded={dropdownOpen}
@@ -66,30 +78,21 @@ const Header = React.memo(() => {
                             <li
                                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                 role="menuitem"
-                                onClick={() => {
-                                    setDropdownOpen(false);
-                                    router("/participated");
-                                }}
+                                onClick={() => handleNavigation("/participated")}
                             >
                                 Participated
                             </li>
                             <li
                                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                 role="menuitem"
-                                onClick={() => {
-                                    setDropdownOpen(false);
-                                    router("/merchant");
-                                }}
+                                onClick={() => handleNavigation("/merchant")}
                             >
                                 Merchant
                             </li>
                             <li
                                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                 role="menuitem"
-                                onClick={() => {
-                                    setDropdownOpen(false);
-                                    router("/privacy");
-                                }}
+                                onClick={() => handleNavigation("/privacy")}
                             >
                                 Privacy Policy
                             </li>
@@ -100,5 +103,7 @@ const Header = React.memo(() => {
         </header>
     );
 });
+
+Header.displayName = 'Header';
 
 export default Header;

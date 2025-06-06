@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import BannerComponent from "../components/BannerComponent";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
@@ -50,6 +51,14 @@ export default function AvailableEvents() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Participated Events
                 </div>
+
+                {/* Top Banner for Participated Events */}
+                <BannerComponent
+                    pageName="Participated Events"
+                    position="top"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mt-2"
+                />
+
                 <section className="mt-4">
                     <div className="p-2 rounded-md shadow-md">
                         {error && <p className="text-red-500">{error}</p>}
@@ -62,6 +71,13 @@ export default function AvailableEvents() {
                         )}
                     </div>
                 </section>
+
+                {/* Bottom Banner for Participated Events */}
+                <BannerComponent
+                    pageName="Participated Events"
+                    position="bottom"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-2"
+                />
             </main>
             <Footer />
         </div>

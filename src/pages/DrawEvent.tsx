@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import BannerComponent from "../components/BannerComponent";
 // Added useRef, useCallback
 import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -646,7 +647,13 @@ export default function DrawEvent() {
         <div className="bg-yellow-300">
             <Header />
             <main className="bg-yellow-300 flex flex-col w-full min-h-screen p-4">
-                {/* All img, h2, p, a, ul, li elements below are exactly as in your original code */}
+                {/* Top Banner for Available Events Details */}
+                <BannerComponent
+                    pageName="Available Events Details"
+                    position="top"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-3"
+                />
+
                 <img
                     src={rewardDetail.draw_image} // Assuming draw_image is always present after loading check
                     alt={rewardDetail.draw_name}
@@ -692,86 +699,15 @@ export default function DrawEvent() {
                         </li>
                     )}
                 </ul>
-                {/* Conditional rendering for Early Bird prizes (logic from original) */}
-                {rewardDetail.Prize_list.some(
-                    (prize) => Number(prize.e_no_of_prize || "0") !== 0
-                ) && (
-                    <>
-                        <h2 className="text-center text-black font-bold">
-                            Early Birds Prize:
-                        </h2>
-                        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-center text-black p-2 rounded-lg border border-black">
-                            {rewardDetail.Prize_list.filter(
-                                (prize) =>
-                                    Number(prize.e_no_of_prize || "0") !== 0
-                            ).map((prize, index) => (
-                                <li
-                                    key={`early-${index}`} // Unique key for early prizes
-                                    className="flex justify-between items-center"
-                                >
-                                    <div className="flex-1">
-                                        {prize.e_no_win_prize}
-                                    </div>
-                                    <div className="flex-1">
-                                        {prize.e_no_of_prize}
-                                    </div>
-                                    <div className="flex-1">
-                                        {prize.e_prize}
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </>
-                )}
-                <h2 className="text-center text-black font-bold">
-                    Event Brief:
-                </h2>
-                {/* Using dangerouslySetInnerHTML as in original */}
-                <p
+
+                {/* Show detailed draw content */}
+                <h2 className="text-center text-black font-bold">Event Details:</h2>
+                <div
                     className="text-center text-black border border-black p-2 rounded-lg min-h-10"
-                    dangerouslySetInnerHTML={{
-                        __html:
-                            rewardDetail.draw_detail || "No details provided.", // Fallback text
-                    }}
+                    dangerouslySetInnerHTML={{ __html: rewardDetail.draw_detail }}
                 />
-                <h2 className="text-center text-black font-bold">
-                    Draw to be performed on:
-                </h2>
-                {/* Date formatting as in original, ensure winner_declare_date is valid */}
-                <p className="text-center text-black border border-black p-2 rounded-lg text-lg">
-                    {rewardDetail.winner_declare_date
-                        ? new Date(
-                              rewardDetail.winner_declare_date
-                          ).toLocaleDateString("en-IN", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                          }) +
-                          " @ " +
-                          new Date(
-                              rewardDetail.winner_declare_date
-                          ).toLocaleTimeString("en-IN", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: false,
-                          }) +
-                          " GMT"
-                        : "Date not specified"}
-                </p>
 
-                {/* --- Conditional UI Blocks (Driven by updated state logic) --- */}
-
-                {/* 'Already Joined' message */}
-                {hasJoined && (
-                    <div className="flex justify-center items-center my-3">
-                        <p className="text-center text-green-700 font-bold bg-green-100 border border-green-300 p-2 rounded-lg">
-                            ✅ You have already joined this event!
-                        </p>
-                    </div>
-                )}
-
-                {/* 'Join' button and 'Users Left' (Show only if NOT joined AND within date range) */}
+                {/* Show join button if user hasn't joined and it's within date range */}
                 {!hasJoined && isWithinDateRange && (
                     <div className="flex flex-col items-center my-3">
                         {" "}
@@ -827,71 +763,42 @@ export default function DrawEvent() {
                     </p>
                 )}
 
-                {/* Share Button (commented out)
-                <div
-                className="rounded-full w-12 h-12 bg-red-500 justify-center items-center flex mx-auto"
-                onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                WebApp.showAlert(
-                    "Event link has been copied successfully. Paste it to telegram to share it with your friends"
-                );
-                }}
-                role="button"
-                tabIndex={0}
-                title="Copy event link"
-                >
-                <img
-                className="w-6 h-6"
-                src="/bonus-monster/share.png"
-                alt="Share"
+                {/* Bottom Banner for Available Events Details */}
+                <BannerComponent
+                    pageName="Available Events Details"
+                    position="bottom"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mt-3"
                 />
-                </div>
-                */}
 
                 <Footer />
 
                 {/* --- Modals (JSX structure identical to original) --- */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                        <div className="bg-yellow-300 p-6 rounded-lg flex flex-col items-center">
-                            {/* Modal title includes step count */}
+                        <div className="bg-white p-6 rounded-lg">
                             <h2 className="text-center text-black font-bold mb-4">
-                                Please input the verification link (Step{" "}
-                                {currentVerificationIndex + 1} of{" "}
-                                {availableVerificationLinks.length || 1}):{" "}
-                                {/* Added || 1 fallback */}
+                                Enter Channel Link to Verify Join:
                             </h2>
                             <input
-                                type="text" // Keep type="text" as original
+                                type="text"
                                 value={verificationLink}
                                 onChange={(e) =>
                                     setVerificationLink(e.target.value)
                                 }
-                                className="w-full p-2 bg-yellow-300 border-2 border-black rounded mb-4" // Classes from original
-                                placeholder="Paste event post link here" // Add placeholder for usability
+                                placeholder="Paste the channel link here"
+                                className="w-full p-2 mb-4 border border-gray-300 rounded"
                             />
                             <img
                                 src={rewardDetail.draw_image}
                                 alt={rewardDetail.draw_name}
-                                className="rounded mb-4" // Classes from original
+                                className="rounded mb-4"
                             />
-                            {/* Added Cancel button for better UX, optional */}
-                            <div className="flex w-full justify-center space-x-4">
-                                <button
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="bg-gray-500 p-2 px-8 rounded-lg text-white font-semibold" // Example styling, adjust if needed
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleModalSubmit}
-                                    className="bg-green-600 p-2 px-10 rounded-lg text-white font-semibold" // Classes from original
-                                    // Optionally disable if link is empty
-                                    disabled={!verificationLink.trim()}
-                                >
-                                    Submit
-                                </button>
-                            </div>
+                            <button
+                                onClick={handleModalSubmit}
+                                className="bg-green-600 p-2 px-10 rounded-lg text-white font-semibold"
+                            >
+                                Submit
+                            </button>
                         </div>
                     </div>
                 )}

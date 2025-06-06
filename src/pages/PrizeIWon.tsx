@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import BannerComponent from "../components/BannerComponent";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import WebApp from "@twa-dev/sdk";
@@ -68,6 +69,14 @@ export default function PrizeIWon() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Prize I Won
                 </div>
+
+                {/* Top Banner for Prize I Won */}
+                <BannerComponent
+                    pageName="Prize I Won"
+                    position="top"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mt-2"
+                />
+
                 <section className="mt-4 px-2">
                     {draws.length === 0 ? (
                         <h2 className="p-2 text-center rounded-md shadow-md">
@@ -83,6 +92,14 @@ export default function PrizeIWon() {
                         ))
                     )}
                 </section>
+
+                {/* Bottom Banner for Prize I Won */}
+                <BannerComponent
+                    pageName="Prize I Won"
+                    position="bottom"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-2"
+                />
+
                 {selectedDraw && (
                     <DrawDetail
                         draw={selectedDraw}

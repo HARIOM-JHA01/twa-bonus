@@ -1,9 +1,18 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { useState, useEffect, useContext } from "react";
+import BannerComponent from "../components/BannerComponent";
+import {
+    useState,
+    useEffect,
+    useContext,
+    useCallback,
+    memo,
+    useMemo,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import WebApp from "@twa-dev/sdk";
+import React from "react";
 
 import { Draw } from "../types/type";
 
@@ -25,11 +34,18 @@ export default function OngoingEvents() {
     const [countries, setCountries] = useState<Country[]>([]);
     const userContext = useContext(UserContext);
     const user = userContext?.user;
-
-    // Local state for the selected country name.
     const [selectedCountry, setSelectedCountry] = useState<string>("");
 
-    // Fetch the list of countries and set the default selection based on the user's current country.
+    // Memoize the country change handler
+    const handleCountryChange = useCallback(
+        (e: React.ChangeEvent<HTMLSelectElement>) => {
+            setSelectedCountry(e.target.value);
+            console.log("Selected country:", e.target.value);
+        },
+        []
+    );
+
+    // Separate useEffect for countries (only depends on user.country)
     useEffect(() => {
         const fetchCountries = async () => {
             try {
@@ -39,7 +55,6 @@ export default function OngoingEvents() {
                 const data = await response.json();
                 if (data.status) {
                     setCountries(data.data);
-                    // If user has a country (stored as country name), find the matching country.
                     if (user?.country) {
                         const found = data.data.find(
                             (c: Country) =>
@@ -59,19 +74,34 @@ export default function OngoingEvents() {
         };
 
         fetchCountries();
-    }, [user]);
+    }, [user?.country]); // Only depend on user.country, not entire user object
 
-    // Fetch the running draws whenever the user or selected country changes.
+    // Separate useEffect for BackButton setup
+    useEffect(() => {
+        const handleBackButton = () => {
+            window.history.back();
+        };
+
+        WebApp.BackButton.show();
+        WebApp.BackButton.onClick(handleBackButton);
+
+        return () => {
+            WebApp.BackButton.offClick(handleBackButton);
+            WebApp.BackButton.hide();
+        };
+    }, []); // Empty dependency array - only run once
+
+    // Separate useEffect for draws
     useEffect(() => {
         if (!user?.id) {
             console.error("User ID not available, cannot fetch data");
             return;
         }
+
         const fetchDraws = async () => {
             try {
                 const payload = {
                     user_id: user.id,
-                    // Passing the selected country name in the payload.
                     country_name: selectedCountry,
                 };
                 console.log("Fetching draws with payload:", payload);
@@ -92,32 +122,15 @@ export default function OngoingEvents() {
                 }
                 const data = await response.json();
                 console.log("Draws data:", data);
-                setDraws(data.data || []); // ensure draws is always an array
+                setDraws(data.data || []);
             } catch (error) {
                 console.error("Error fetching draws:", error);
-                setDraws([]); // fallback to empty array
+                setDraws([]);
             }
         };
 
         fetchDraws();
-
-        WebApp.BackButton.show();
-        WebApp.BackButton.onClick(() => {
-            window.history.back();
-        });
-
-        return () => {
-            WebApp.BackButton.offClick(() => {
-                window.history.back();
-            });
-        };
     }, [user?.id, selectedCountry]);
-
-    // Update the selected country when the user chooses a different one.
-    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCountry(e.target.value);
-        console.log("Selected country:", e.target.value);
-    };
 
     return (
         <div className="bg-yellow-300">
@@ -126,11 +139,21 @@ export default function OngoingEvents() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Ongoing Events
                 </div>
+
+                {/* Top Banner for Ongoing Events */}
+                <BannerComponent
+                    pageName="Ongoing Events"
+                    position="top"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mt-2"
+                />
+
+                {/* Container with fixed width */}
                 <div className="w-[95vw] mx-auto mt-2">
+                    {/* Dropdown now takes full width of container */}
                     <select
                         value={selectedCountry}
                         onChange={handleCountryChange}
-                        className="w-full p-2 rounded border-2 border-black text-white bg-gray-400 font-bold text-lg"
+                        className="w-full p-2 rounded border-2 border-black bg-gray-400 text-white font-bold text-lg"
                     >
                         {selectedCountry === "" && (
                             <option value="">Select Country</option>
@@ -156,6 +179,13 @@ export default function OngoingEvents() {
                         )}
                     </div>
                 </section>
+
+                {/* Bottom Banner for Ongoing Events */}
+                <BannerComponent
+                    pageName="Ongoing Events"
+                    position="bottom"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-2"
+                />
             </main>
             <Footer />
         </div>
@@ -166,61 +196,56 @@ interface DrawCardProps {
     draw: Draw;
 }
 
-export const DrawCard: React.FC<DrawCardProps> = ({ draw }) => {
+export const DrawCard: React.FC<DrawCardProps> = memo(({ draw }) => {
     const navigate = useNavigate();
+
+    // Memoize date formatting to prevent recalculation on every render
+    const formattedStartDate = useMemo(() => {
+        if (!draw.start_date) return "Not Available";
+        const dateObj = new Date(draw.start_date);
+        const datePart = dateObj.toLocaleDateString("en-GB").replace(/\//g, "-");
+        const timePart = dateObj.toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+        return `${datePart} ${timePart} GMT`;
+    }, [draw.start_date]);
+
+    const formattedEndDate = useMemo(() => {
+        if (!draw.end_date) return "Not Available";
+        const dateObj = new Date(draw.end_date);
+        const datePart = dateObj.toLocaleDateString("en-GB").replace(/\//g, "-");
+        const timePart = dateObj.toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+        return `${datePart} ${timePart} GMT`;
+    }, [draw.end_date]);
+
+    const handleCardClick = useCallback(() => {
+        navigate(`/draw-event/${draw.id}`);
+    }, [navigate, draw.id]);
+
     return (
         <div
             className="flex gap-1 flex-col border-2 text-center border-black rounded-lg mb-2 cursor-pointer"
-            onClick={() => navigate(`/draw-event/${draw.id}`)}
+            onClick={handleCardClick}
         >
             <h2 className="text-black ps-3 font-bold">{draw.draw_name}</h2>
             <img
                 src={draw.draw_image}
                 alt={draw.draw_name}
                 className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto"
+                loading="lazy"
             />
             <div className="flex justify-between">
                 <h2 className="text-black ps-3">
-                    Start On:{" "}
-                    {draw.start_date
-                        ? (() => {
-                              const dateObj = new Date(draw.start_date);
-                              // Format the date as dd-mm-yyyy
-                              const datePart = dateObj
-                                  .toLocaleDateString("en-GB")
-                                  .replace(/\//g, "-");
-                              // Format the time as hh:mm (24-hour format)
-                              const timePart = dateObj.toLocaleTimeString(
-                                  "en-GB",
-                                  {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                  }
-                              );
-                              return `${datePart} ${timePart} GMT`;
-                          })()
-                        : "Not Available"}
+                    Start On: {formattedStartDate}
                 </h2>
                 <h2 className="text-black pe-3">
-                    End On:{" "}
-                    {draw.end_date
-                        ? (() => {
-                              const dateObj = new Date(draw.end_date);
-                              const datePart = dateObj
-                                  .toLocaleDateString("en-GB")
-                                  .replace(/\//g, "-");
-                              const timePart = dateObj.toLocaleTimeString(
-                                  "en-GB",
-                                  {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                  }
-                              );
-                              return `${datePart} ${timePart} GMT`;
-                          })()
-                        : "Not Available"}
+                    End On: {formattedEndDate}
                 </h2>
             </div>
         </div>
     );
-};
+});

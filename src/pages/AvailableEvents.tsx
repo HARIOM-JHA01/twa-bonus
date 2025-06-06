@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import BannerComponent from "../components/BannerComponent";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
@@ -109,6 +110,14 @@ export default function AvailableEvents() {
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Available Events
                 </div>
+
+                {/* Top Banner for Available Events */}
+                <BannerComponent
+                    pageName="Available Events"
+                    position="top"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mt-2"
+                />
+
                 {/* Container with fixed width */}
                 <div className="w-[95vw] mx-auto mt-2">
                     {/* Dropdown now takes full width of container */}
@@ -143,6 +152,13 @@ export default function AvailableEvents() {
                         )}
                     </div>
                 </section>
+
+                {/* Bottom Banner for Available Events */}
+                <BannerComponent
+                    pageName="Available Events"
+                    position="bottom"
+                    className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-2"
+                />
             </main>
             <Footer />
         </div>
