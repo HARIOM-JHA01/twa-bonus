@@ -17,6 +17,7 @@ type Country = {
 export default function AvailableEvents() {
     const userContext = useContext(UserContext);
     const user = userContext?.user;
+    const setUser = userContext?.setUser;
     const navigate = useNavigate();
 
     // Local state for the list of countries and the selected country
@@ -44,6 +45,13 @@ export default function AvailableEvents() {
 
         fetchCountries();
     }, []);
+
+    // Update selected country whenever user.country changes
+    useEffect(() => {
+        if (user?.country) {
+            setSelectedCountry(user.country);
+        }
+    }, [user?.country]);
 
     // Fetch draws whenever user id or selectedCountry changes
     useEffect(() => {
@@ -103,6 +111,20 @@ export default function AvailableEvents() {
         window.history.back();
     };
 
+    // Handle country change and update in context
+    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newCountry = e.target.value;
+        setSelectedCountry(newCountry);
+        
+        // Update country in user context to make it consistent across the app
+        if (setUser && user) {
+            setUser({
+                ...user,
+                country: newCountry
+            });
+        }
+    };
+
     return (
         <div className="bg-yellow-300">
             <Header />
@@ -111,11 +133,12 @@ export default function AvailableEvents() {
                     Available Events
                 </div>
 
-                {/* Top Banner for Available Events */}
+                {/* Use BannerComponent with the country prop */}
                 <BannerComponent
                     pageName="Available Events"
                     position="top"
                     className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mt-2"
+                    country={selectedCountry}
                 />
 
                 {/* Container with fixed width */}
@@ -123,7 +146,7 @@ export default function AvailableEvents() {
                     {/* Dropdown now takes full width of container */}
                     <select
                         value={selectedCountry}
-                        onChange={(e) => setSelectedCountry(e.target.value)}
+                        onChange={handleCountryChange}
                         className="w-full p-2 rounded border-2 border-black bg-gray-400 text-white font-bold text-lg"
                     >
                         <option value="">Select a country</option>
@@ -153,11 +176,12 @@ export default function AvailableEvents() {
                     </div>
                 </section>
 
-                {/* Bottom Banner for Available Events */}
+                {/* Bottom Banner with country prop */}
                 <BannerComponent
                     pageName="Available Events"
                     position="bottom"
                     className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto mb-2"
+                    country={selectedCountry}
                 />
             </main>
             <Footer />
@@ -167,7 +191,7 @@ export default function AvailableEvents() {
 
 interface DrawCardProps {
     draw: Draw;
-    navigate: any;
+    navigate: (path: string) => void;
 }
 
 const DrawCard: React.FC<DrawCardProps> = ({ draw, navigate }) => {

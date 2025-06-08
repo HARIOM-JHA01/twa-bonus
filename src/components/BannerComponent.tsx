@@ -1,4 +1,74 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
+import { UserContext } from "../context/UserContext";
+
+// Banner cache system to avoid multiple API calls
+class BannerCache {
+    private static instance: BannerCache;
+    private advertiseBanners: AdvertiseBanner[] = [];
+    private isLoading = false;
+    private loadPromise: Promise<AdvertiseBanner[]> | null = null;
+
+    static getInstance(): BannerCache {
+        if (!BannerCache.instance) {
+            BannerCache.instance = new BannerCache();
+        }
+        return BannerCache.instance;
+    }
+
+    async getAdvertiseBanners(): Promise<AdvertiseBanner[]> {
+        // Return cached data if available
+        if (this.advertiseBanners.length > 0) {
+            return this.advertiseBanners;
+        }
+
+        // Return existing promise if already loading
+        if (this.isLoading && this.loadPromise) {
+            return this.loadPromise;
+        }
+
+        // Start loading
+        this.isLoading = true;
+        this.loadPromise = this.fetchAdvertiseBanners();
+        
+        try {
+            this.advertiseBanners = await this.loadPromise;
+            return this.advertiseBanners;
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    private async fetchAdvertiseBanners(): Promise<AdvertiseBanner[]> {
+        try {
+            const response = await fetch('https://bonusforyou.org/api/advertiseBanner');
+            const data = await response.json();
+            
+            if (data.status && data.data.length > 0) {
+                return data.data;
+            }
+            return [];
+        } catch (error) {
+            console.error('Error fetching advertisement banners:', error);
+            return [];
+        }
+    }
+
+    getRandomBanner(): AdvertiseBanner | null {
+        if (this.advertiseBanners.length === 0) return null;
+        const randomIndex = Math.floor(Math.random() * this.advertiseBanners.length);
+        return this.advertiseBanners[randomIndex];
+    }
+
+    // Clear cache (useful for refresh scenarios)
+    clearCache(): void {
+        this.advertiseBanners = [];
+        this.isLoading = false;
+        this.loadPromise = null;
+    }
+}
+
+// Get cache instance
+const bannerCache = BannerCache.getInstance();
 
 interface BannerImage {
     id: number;
@@ -30,6 +100,7 @@ interface BannerComponentProps {
     pageName: string; // e.g., "Available Events", "Ongoing Events", etc.
     position: 'top' | 'bottom';
     className?: string;
+    country?: string; // Add optional country prop
 }
 
 // Track impressions per session to avoid duplicate calls
@@ -38,13 +109,17 @@ const sessionImpressions = new Set<string>();
 const BannerComponent: React.FC<BannerComponentProps> = ({ 
     pageName, 
     position, 
-    className = "rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto my-2" 
+    className = "rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto my-2",
+    country
 }) => {
+    const userContext = useContext(UserContext);
+    const user = userContext?.user;
     const [bannerImage, setBannerImage] = useState<BannerImage | null>(null);
     const [fallbackBanner, setFallbackBanner] = useState<AdvertiseBanner | null>(null);
     const [loading, setLoading] = useState(true);
     const [imageError, setImageError] = useState(false);
     const impressionSent = useRef(false);
+    const [countrySpecificImage, setCountrySpecificImage] = useState<string | null>(null);
 
     // Page name to page_id mapping based on actual API data
     const getPageId = (pageName: string): number => {
@@ -56,7 +131,7 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
             'Prize I Won': 12,
             'Participants My Profile': 14,
         };
-        return pageMapping[pageName] || 4; // Default to Participant My panel if not found
+        return pageMapping[pageName] || 4; 
     };
 
     // Track banner impression (only once per banner per session)
@@ -107,37 +182,78 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
     // Fetch fallback advertisement banner
     const fetchFallbackBanner = async () => {
         try {
-            const response = await fetch('https://bonusforyou.org/api/advertiseBanner');
-            const data = await response.json();
-            
-            if (data.status && data.data.length > 0) {
-                const randomIndex = Math.floor(Math.random() * data.data.length);
-                setFallbackBanner(data.data[randomIndex]);
+            const banners = await bannerCache.getAdvertiseBanners();
+            if (banners.length > 0) {
+                const randomIndex = Math.floor(Math.random() * banners.length);
+                setFallbackBanner(banners[randomIndex]);
             }
         } catch (error) {
             console.error('Error fetching fallback banner:', error);
         }
     };
 
+    // Fetch country-specific banner image
+    const fetchCountrySpecificBanner = async (countryName: string, pageId: number, position: string) => {
+        try {
+            const apiUrl = `https://bonusforyou.org/api/user/get-country-wise-banner-image/?app_name=bonusmonster&page_id=${pageId}&position=${position}&country=${countryName.toLowerCase()}`;
+            
+            console.log(`BannerComponent country-specific API URL: ${apiUrl}`);
+            
+            const response = await fetch(apiUrl);
+            if (response.ok) {
+                const data = await response.json();
+                console.log(`BannerComponent country-specific API data:`, data);
+                
+                if (data.status && data.data?.banner_image) {
+                    setCountrySpecificImage(data.data.banner_image);
+                    return true;
+                }
+            }
+            return false;
+        } catch (error) {
+            console.error('Error fetching country-specific banner:', error);
+            return false;
+        }
+    };
+
     useEffect(() => {
         const fetchBannerData = async () => {
             try {
+                console.log(`BannerComponent mounting: ${pageName} - ${position}`); // Debug log
                 setLoading(true);
                 const pageId = getPageId(pageName);
+                console.log(`BannerComponent pageId: ${pageId} for ${pageName} - ${position}`); // Debug log
 
+                // First try to fetch country-specific banner if country is provided
+                const countryToUse = country || user?.country || '';
+                
+                if (countryToUse) {
+                    console.log(`Trying to fetch country-specific banner for ${countryToUse}`);
+                    const gotCountryBanner = await fetchCountrySpecificBanner(countryToUse, pageId, position);
+                    
+                    if (gotCountryBanner) {
+                        console.log(`Successfully fetched country-specific banner for ${countryToUse}`);
+                        setLoading(false);
+                        return;
+                    }
+                }
+                
+                // If country-specific banner failed or not available, fall back to regular banner
                 // Use different API endpoints for development vs production
-                // In development: use proxy (/api/banner -> /api/user)
-                // In production: use direct API endpoint
                 const isDevelopment = import.meta.env.DEV;
                 const apiUrl = isDevelopment 
                     ? `/api/banner/get-banner-image?app_name=bonusmonster&page_id=${pageId}&position=${position}`
                     : `https://bonusforyou.org/api/user/get-banner-image?app_name=bonusmonster&page_id=${pageId}&position=${position}`;
+                
+                console.log(`BannerComponent API URL: ${apiUrl}`); // Debug log
 
                 // Fetch banner directly using the correct API
                 const response = await fetch(apiUrl);
+                console.log(`BannerComponent API response status: ${response.status} for ${pageName} - ${position}`); // Debug log
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(`BannerComponent API data:`, data); // Debug log
                     
                     if (data.status && data.data && data.data.length > 0) {
                         const banner = data.data[0];
@@ -150,14 +266,17 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
                             }, 1000); // Small delay to ensure banner is visible
                             return;
                         }
+                    } else {
+                        console.log(`BannerComponent: No banner data for ${pageName} - ${position}`); // Debug log
                     }
                 }
                 
                 // If no banner found or API error, fetch fallback
+                console.log(`BannerComponent: Fetching fallback for ${pageName} - ${position}`); // Debug log
                 await fetchFallbackBanner();
                 
             } catch (error) {
-                console.error('Error fetching banner data:', error);
+                console.error(`BannerComponent error for ${pageName} - ${position}:`, error);
                 // Fetch fallback on error
                 await fetchFallbackBanner();
             } finally {
@@ -166,7 +285,7 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
         };
 
         fetchBannerData();
-    }, [pageName, position]);
+    }, [pageName, position, country, user?.country]);
 
     const handleBannerClick = async () => {
         if (bannerImage) {
@@ -202,7 +321,11 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
     let bannerSrc = '';
     let bannerAlt = '';
 
-    if (bannerImage && !imageError) {
+    // Prioritize country-specific image
+    if (countrySpecificImage) {
+        bannerSrc = countrySpecificImage;
+        bannerAlt = `${pageName} ${position} country-specific banner`;
+    } else if (bannerImage && !imageError) {
         bannerSrc = `https://bonusforyou.org/public/AdverBannerImages/${bannerImage.display_banner_image}`;
         bannerAlt = `${pageName} ${position} banner`;
     } else if (fallbackBanner) {
