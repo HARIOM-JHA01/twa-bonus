@@ -225,52 +225,6 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
         }
     };
 
-    // Fetch country-specific banner image
-    const fetchCountrySpecificBanner = async (countryName: string, pageId: number, position: string) => {
-        try {
-            // Always clear previous country-specific image when fetching a new one
-            setCountrySpecificImage(null);
-            
-            // Use different API endpoints for development vs production
-            const isDevelopment = import.meta.env.DEV;
-            
-            const apiUrl = isDevelopment 
-                ? `/api/country-banner/get-country-wise-banner-image/?app_name=bonusmonster&page_id=${pageId}&position=${position}&country=${countryName.toLowerCase()}`
-                : `https://bonusforyou.org/api/user/get-country-wise-banner-image?app_name=bonusmonster&page_id=${pageId}&position=${position}&country=${countryName.toLowerCase()}`;
-            
-            console.log(`BannerComponent country-specific API URL: ${apiUrl}`);
-            
-            const response = await fetch(apiUrl);
-            console.log(`Country API response status: ${response.status}`);
-            
-            // Even if response is 404, we need to check the JSON response
-            const data = await response.json();
-            console.log(`BannerComponent country-specific API data:`, data);
-            
-            // Check if the response contains a valid banner image
-            if (data.status === true || data.status === 'success') {
-                if (data.data?.banner_image) {
-                    setCountrySpecificImage(data.data.banner_image);
-                    return true;
-                } else if (data.banner_image) {
-                    setCountrySpecificImage(data.banner_image);
-                    return true;
-                } else if (data.data && typeof data.data === 'string') {
-                    // Handle case where data.data might be the image URL directly
-                    setCountrySpecificImage(data.data);
-                    return true;
-                }
-            }
-            
-            // If we get here, either status is false or there was no banner image in the data
-            console.log('No valid country-specific banner found for', countryName);
-            return false;
-        } catch (error) {
-            console.error('Error fetching country-specific banner:', error);
-            return false;
-        }
-    };
-
     useEffect(() => {
         const fetchBannerData = async () => {
             try {

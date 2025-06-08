@@ -7,7 +7,6 @@ import { UserContext } from "../context/UserContext.js";
 
 export default function Profile() {
     const [error, setError] = useState("");
-    const profileImage = "/bonus-monster/profile.jpg";
 
     const userContext = useContext(UserContext);
     if (!userContext) {
@@ -51,12 +50,6 @@ export default function Profile() {
                         {isLoggedIn ? (
                             <div className="flex flex-col gap-4 max-w-md bg-yellow-300 rounded-lg w-full">
                                 <div className="flex flex-col px-4">
-                                    {/* <img
-                                        src={profileImage}
-                                        alt="Bonus For You Logo"
-                                        className="rounded-lg shadow-lg w-full h-[120px] mb-5"
-                                    /> */}
-
                                     <label className="font-semibold text-xl text-black">
                                         Name
                                     </label>

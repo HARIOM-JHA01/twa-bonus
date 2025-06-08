@@ -5,18 +5,10 @@ import { useNavigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import { UserContext } from "./context/UserContext";
 import { useTranslation } from "react-i18next";
-import headerImage from "/profile.jpg";
 import BannerComponent from "./components/BannerComponent";
-
-type PromotionBanner = {
-    draw_image: string;
-    draw_name: string;
-};
 
 function App() {
     const { setUser, setIsLoggedIn, isLoggedIn, hasAttemptedLogin, setHasAttemptedLogin } = useContext(UserContext);
-    const [promotionBanner, setPromotionBanner] =
-        useState<PromotionBanner | null>(null);
     const [loading, setLoading] = useState(() => {
         // If already logged in, don't show loading
         return !isLoggedIn;
@@ -166,18 +158,6 @@ function App() {
                 />
 
                 <main className="bg-yellow-300 pt-4 flex flex-col justify-start items-center w-full flex-grow">
-                    {/* COMMENTED OUT: Promotion banner display */}
-                    {/*
-                    {promotionBanner && (
-                        <img
-                            src={headerImage}
-                            alt={promotionBanner?.draw_name || ""}
-                            className="rounded-lg shadow-lg w-[90vw] h-[120px] mx-auto"
-                            loading="lazy"
-                        />
-                    )}
-                    */}
-
                     <section className="flex flex-col gap-4 mt-4 mb-4 items-center">
                         <div
                             onClick={() => handleNavigation("/available-rewards")}
