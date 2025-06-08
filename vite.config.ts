@@ -21,6 +21,13 @@ export default defineConfig({
                 changeOrigin: true,
                 secure: true,
                 rewrite: (path) => path.replace(/^\/api\/banner/, '/api/user')
+            },
+            // Add specific proxy for country-wise-banner-image endpoint
+            '/api/country-banner': {
+                target: 'https://bonusforyou.org',
+                changeOrigin: true,
+                secure: true,
+                rewrite: (path) => path.replace(/^\/api\/country-banner/, '/api/user')
             }
         }
     }

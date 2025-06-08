@@ -7,12 +7,44 @@ class BannerCache {
     private advertiseBanners: AdvertiseBanner[] = [];
     private isLoading = false;
     private loadPromise: Promise<AdvertiseBanner[]> | null = null;
+    // Track last country that successfully returned banners
+    private static lastSuccessfulCountry: string | null = null;
+    private static currentCountry: string | null = null;
 
     static getInstance(): BannerCache {
         if (!BannerCache.instance) {
             BannerCache.instance = new BannerCache();
         }
         return BannerCache.instance;
+    }
+
+    // Get current country being used
+    static getCurrentCountry(): string | null {
+        return BannerCache.currentCountry;
+    }
+
+    // Set current country
+    static setCurrentCountry(country: string | null): void {
+        // Only clear last successful country if the country changes
+        if (country !== BannerCache.currentCountry) {
+            console.log(`Changing country from ${BannerCache.currentCountry} to ${country}`);
+            BannerCache.currentCountry = country;
+            
+            // Clear last successful country when changing countries
+            // This forces all banner components to refresh
+            BannerCache.lastSuccessfulCountry = null;
+        }
+    }
+
+    // Track when a country successfully returns banners
+    static setCountrySuccess(country: string): void {
+        BannerCache.lastSuccessfulCountry = country;
+    }
+
+    // Check if current country is successful 
+    static isCurrentCountrySuccessful(): boolean {
+        return BannerCache.currentCountry !== null && 
+               BannerCache.lastSuccessfulCountry === BannerCache.currentCountry;
     }
 
     async getAdvertiseBanners(): Promise<AdvertiseBanner[]> {
@@ -64,6 +96,7 @@ class BannerCache {
         this.advertiseBanners = [];
         this.isLoading = false;
         this.loadPromise = null;
+        BannerCache.lastSuccessfulCountry = null;
     }
 }
 
@@ -195,7 +228,15 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
     // Fetch country-specific banner image
     const fetchCountrySpecificBanner = async (countryName: string, pageId: number, position: string) => {
         try {
-            const apiUrl = `https://bonusforyou.org/api/user/get-country-wise-banner-image/?app_name=bonusmonster&page_id=${pageId}&position=${position}&country=${countryName.toLowerCase()}`;
+            // Always clear previous country-specific image when fetching a new one
+            setCountrySpecificImage(null);
+            
+            // Use different API endpoints for development vs production
+            const isDevelopment = import.meta.env.DEV;
+            
+            const apiUrl = isDevelopment 
+                ? `/api/country-banner/get-country-wise-banner-image/?app_name=bonusmonster&page_id=${pageId}&position=${position}&country=${countryName.toLowerCase()}`
+                : `https://bonusforyou.org/api/user/get-country-wise-banner-image/?app_name=bonusmonster&page_id=${pageId}&position=${position}&country=${countryName.toLowerCase()}`;
             
             console.log(`BannerComponent country-specific API URL: ${apiUrl}`);
             
@@ -221,6 +262,14 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
             try {
                 console.log(`BannerComponent mounting: ${pageName} - ${position}`); // Debug log
                 setLoading(true);
+                
+                // Reset all banner states when dependencies change (especially country)
+                setBannerImage(null);
+                setCountrySpecificImage(null);
+                setFallbackBanner(null);
+                setImageError(false);
+                impressionSent.current = false;
+                
                 const pageId = getPageId(pageName);
                 console.log(`BannerComponent pageId: ${pageId} for ${pageName} - ${position}`); // Debug log
 
