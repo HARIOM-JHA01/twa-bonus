@@ -139,6 +139,13 @@ interface BannerComponentProps {
 // Track impressions per session to avoid duplicate calls
 const sessionImpressions = new Set<string>();
 
+// Store selected banners per position to enable rotation
+const bannerRotationStore: Record<string, {
+    banners: BannerImage[],
+    currentIndex: number,
+    lastRotationTime: number
+}> = {};
+
 const BannerComponent: React.FC<BannerComponentProps> = ({ 
     pageName, 
     position, 
@@ -225,6 +232,36 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
         }
     };
 
+    // Get the next banner from the rotation store for this page and position
+    const getNextRotatingBanner = (pageId: number, position: string, eligibleBanners: BannerImage[]): BannerImage => {
+        const rotationKey = `${pageId}-${position}`;
+        const now = Date.now();
+        
+        // Initialize or update rotation store for this position
+        if (!bannerRotationStore[rotationKey] || bannerRotationStore[rotationKey].banners.length !== eligibleBanners.length) {
+            // If banners changed or first time, reinitialize
+            bannerRotationStore[rotationKey] = {
+                banners: [...eligibleBanners],
+                currentIndex: 0,
+                lastRotationTime: now
+            };
+            console.log(`Initialized banner rotation for ${rotationKey} with ${eligibleBanners.length} banners`);
+        } else {
+            // Only advance to next banner if it's been at least 30 seconds since last rotation
+            // This prevents banner flickering during normal component re-renders
+            const timeSinceLastRotation = now - bannerRotationStore[rotationKey].lastRotationTime;
+            if (timeSinceLastRotation >= 30000) { // 30 seconds in milliseconds
+                bannerRotationStore[rotationKey].currentIndex = 
+                    (bannerRotationStore[rotationKey].currentIndex + 1) % bannerRotationStore[rotationKey].banners.length;
+                bannerRotationStore[rotationKey].lastRotationTime = now;
+                console.log(`Rotating to next banner for ${rotationKey}, index: ${bannerRotationStore[rotationKey].currentIndex}`);
+            }
+        }
+        
+        // Return the current banner in the rotation
+        return bannerRotationStore[rotationKey].banners[bannerRotationStore[rotationKey].currentIndex];
+    };
+
     useEffect(() => {
         const fetchBannerData = async () => {
             try {
@@ -302,19 +339,30 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
                             console.log('Regular banner data:', data);
                             
                             if (data.status && data.data && data.data.length > 0) {
-                                // Pick a random banner if multiple banners are available
-                                const randomIndex = Math.floor(Math.random() * data.data.length);
-                                const banner = data.data[randomIndex];
-                                console.log(`Selected random banner ${randomIndex + 1} of ${data.data.length}:`, banner);
+                                // Filter banners that match our position OR have "random" position
+                                const eligibleBanners = data.data.filter((banner: BannerImage) => 
+                                    banner.display_position === position || 
+                                    banner.display_position === 'random'
+                                );
                                 
-                                if (banner.display_status === 1) {
-                                    setBannerImage(banner);
-                                    // Track impression when banner is loaded
-                                    setTimeout(() => {
-                                        trackImpression(pageId, banner.id);
-                                    }, 1000); // Small delay to ensure banner is visible
-                                    setLoading(false);
-                                    return;
+                                if (eligibleBanners.length > 0) {
+                                    console.log(`Found ${eligibleBanners.length} eligible banners (position: "${position}" or "random")`);
+                                    
+                                    // Use the rotation mechanism instead of random selection
+                                    const banner = getNextRotatingBanner(pageId, position, eligibleBanners);
+                                    console.log(`Using rotating banner for ${pageName}-${position}:`, banner);
+                                    
+                                    if (banner.display_status === 1) {
+                                        setBannerImage(banner);
+                                        // Track impression when banner is loaded
+                                        setTimeout(() => {
+                                            trackImpression(pageId, banner.id);
+                                        }, 1000); // Small delay to ensure banner is visible
+                                        setLoading(false);
+                                        return;
+                                    }
+                                } else {
+                                    console.log(`No banners found with position "${position}" or "random"`);
                                 }
                             }
                         }
@@ -348,19 +396,30 @@ const BannerComponent: React.FC<BannerComponentProps> = ({
                             console.log('Regular banner data:', data);
                             
                             if (data.status && data.data && data.data.length > 0) {
-                                // Pick a random banner if multiple banners are available
-                                const randomIndex = Math.floor(Math.random() * data.data.length);
-                                const banner = data.data[randomIndex];
-                                console.log(`Selected random banner ${randomIndex + 1} of ${data.data.length}:`, banner);
+                                // Filter banners that match our position OR have "random" position
+                                const eligibleBanners = data.data.filter((banner: BannerImage) => 
+                                    banner.display_position === position || 
+                                    banner.display_position === 'random'
+                                );
                                 
-                                if (banner.display_status === 1) {
-                                    setBannerImage(banner);
-                                    // Track impression when banner is loaded
-                                    setTimeout(() => {
-                                        trackImpression(pageId, banner.id);
-                                    }, 1000); // Small delay to ensure banner is visible
-                                    setLoading(false);
-                                    return;
+                                if (eligibleBanners.length > 0) {
+                                    console.log(`Found ${eligibleBanners.length} eligible banners (position: "${position}" or "random")`);
+                                    
+                                    // Use the rotation mechanism instead of random selection
+                                    const banner = getNextRotatingBanner(pageId, position, eligibleBanners);
+                                    console.log(`Using rotating banner for ${pageName}-${position}:`, banner);
+                                    
+                                    if (banner.display_status === 1) {
+                                        setBannerImage(banner);
+                                        // Track impression when banner is loaded
+                                        setTimeout(() => {
+                                            trackImpression(pageId, banner.id);
+                                        }, 1000); // Small delay to ensure banner is visible
+                                        setLoading(false);
+                                        return;
+                                    }
+                                } else {
+                                    console.log(`No banners found with position "${position}" or "random"`);
                                 }
                             }
                         }
