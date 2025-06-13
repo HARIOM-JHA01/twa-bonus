@@ -65,7 +65,7 @@ export default function PrizeIWon() {
     return (
         <div className="bg-yellow-300">
             <Header />
-            <main className="bg-yellow-300 flex flex-col min-h-[70vh] w-full relative">
+            <main className="bg-yellow-300 flex flex-col min-h-[100vh] w-full relative">
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Prize I Won
                 </div>

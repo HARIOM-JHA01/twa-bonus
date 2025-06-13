@@ -47,7 +47,7 @@ export default function AvailableEvents() {
     return (
         <div className="bg-yellow-300">
             <Header />
-            <main className="bg-yellow-300 flex flex-col min-h-[70vh] w-full">
+            <main className="bg-yellow-300 flex flex-col min-h-[100vh] w-full">
                 <div className="text-center text-lg font-bold text-white bg-gray-500">
                     Participated Events
                 </div>
